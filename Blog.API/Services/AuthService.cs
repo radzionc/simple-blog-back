@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Blog.API.Services.Abstraction;
 using Blog.API.ViewModels;
+using CryptoHelper;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Blog.API.Services
@@ -16,14 +17,14 @@ namespace Blog.API.Services
             this.jwtSecret = jwtSecret;
             this.jwtLifespan = jwtLifespan;
         }
-        public AuthData GetAuthData(int id)
+        public AuthData GetAuthData(string id)
         {
             var expirationTime = DateTime.UtcNow.AddSeconds(jwtLifespan);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name, id.ToString())
+                    new Claim(ClaimTypes.Name, id)
                 }),
                 Expires = expirationTime,
                 SigningCredentials = new SigningCredentials(
@@ -40,5 +41,15 @@ namespace Blog.API.Services
                 Id = id
             };
         }
+
+    public string HashPassword(string password)
+    {
+      return Crypto.HashPassword(password);
     }
+
+    public bool VerifyPassword(string actualPassword, string hashedPassword)
+    {
+      return Crypto.VerifyHashedPassword(hashedPassword, actualPassword);
+    }
+  }
 }

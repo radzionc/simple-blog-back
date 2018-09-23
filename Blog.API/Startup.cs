@@ -41,7 +41,10 @@ namespace Blog.API
             services
                 .AddEntityFrameworkNpgsql()
                 .AddDbContext<BlogContext>(options =>
-                    options.UseNpgsql(Configuration.GetConnectionString("BlogContext"))
+                    options.UseNpgsql(
+                        Configuration.GetConnectionString("BlogContext"),
+                        o => o.MigrationsAssembly("Blog.API")
+                    )
                 );
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -97,7 +100,7 @@ namespace Blog.API
                 .AllowAnyHeader()
                 .AllowCredentials()
             ); 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             
             app.UseAuthentication();
 

@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CryptoHelper" Version="3.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.3" />

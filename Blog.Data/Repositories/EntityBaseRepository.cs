@@ -14,7 +14,6 @@ namespace Blog.Data.Repositories
     public class EntityBaseRepository<T> : IEntityBaseRepository<T>
             where T : class, IEntityBase, new()
     {
-
         private BlogContext _context;
 
         public EntityBaseRepository(BlogContext context)
@@ -40,7 +39,7 @@ namespace Blog.Data.Repositories
             return query.AsEnumerable();
         }
 
-        public T GetSingle(int id)
+        public T GetSingle(string id)
         {
             return _context.Set<T>().FirstOrDefault(x => x.Id == id);
         }

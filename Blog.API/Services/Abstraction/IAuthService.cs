@@ -4,6 +4,8 @@ namespace Blog.API.Services.Abstraction
 {
     public interface IAuthService
     {
-        AuthData GetAuthData(int id);
+        string HashPassword(string password);
+        bool VerifyPassword(string actualPassword, string hashedPassword);
+        AuthData GetAuthData(string id);
     }
 }
