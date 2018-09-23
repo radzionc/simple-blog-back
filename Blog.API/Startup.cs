@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Blog.API.Services;
+using Blog.API.Services.Abstraction;
 using Blog.Data;
 using Blog.Data.Abstract;
 using Blog.Data.Repositories;
@@ -60,6 +62,13 @@ namespace Blog.API
 
             
             services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddSingleton<IAuthService>(
+                new AuthService(
+                    Configuration.GetValue<string>("JWTSecretKey"),
+                    Configuration.GetValue<int>("JWTLifespan")
+                )
+            );
 
             services
                 .AddMvc()
