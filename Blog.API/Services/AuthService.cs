@@ -1,6 +1,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Blog.API.Services.Abstraction;
 using Blog.API.ViewModels;
 using CryptoHelper;
@@ -20,6 +21,7 @@ namespace Blog.API.Services
         public AuthData GetAuthData(string id)
         {
             var expirationTime = DateTime.UtcNow.AddSeconds(jwtLifespan);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -27,8 +29,9 @@ namespace Blog.API.Services
                     new Claim(ClaimTypes.Name, id)
                 }),
                 Expires = expirationTime,
+                // new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256Signature)
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(Convert.FromBase64String(jwtSecret)), 
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)), 
                     SecurityAlgorithms.HmacSha256Signature
                 )
             };

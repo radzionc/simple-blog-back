@@ -18,6 +18,7 @@ namespace Blog.Data
             }
 
             ConfigureModelBuilderForUser(modelBuilder);
+            ConfigureModelBuilderForStory(modelBuilder);
         }
 
         void ConfigureModelBuilderForUser(ModelBuilder modelBuilder)
@@ -32,6 +33,24 @@ namespace Blog.Data
                 .Property(user => user.Email)
                 .HasMaxLength(60)
                 .IsRequired();
+        }
+
+        void ConfigureModelBuilderForStory(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Story>().ToTable("Story");
+            modelBuilder.Entity<Story>()
+                .Property(s => s.Title)
+                .HasMaxLength(60);
+            
+            modelBuilder.Entity<Story>()
+                .Property(s => s.OwnerId)
+                .IsRequired();
+            
+            modelBuilder.Entity<Story>()
+                .HasOne(s => s.Owner)
+                .WithMany(u => u.Stories)
+                .HasForeignKey(s => s.OwnerId);
+            
         }
     }
 }

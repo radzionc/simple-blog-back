@@ -65,6 +65,7 @@ namespace Blog.API
 
             
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IStoryRepository, StoryRepository>();
 
             services.AddSingleton<IAuthService>(
                 new AuthService(
