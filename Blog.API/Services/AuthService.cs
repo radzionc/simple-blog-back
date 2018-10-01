@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Blog.API.Services.Abstraction;
@@ -28,7 +29,7 @@ namespace Blog.API.Services
                 }),
                 Expires = expirationTime,
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(Convert.FromBase64String(jwtSecret)), 
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)), 
                     SecurityAlgorithms.HmacSha256Signature
                 )
             };
