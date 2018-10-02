@@ -35,6 +35,8 @@ namespace Blog.API.Migrations
                     b.Property<string>("OwnerId")
                         .IsRequired();
 
+                    b.Property<long>("PublishTime");
+
                     b.Property<List<string>>("Tags");
 
                     b.Property<string>("Title")

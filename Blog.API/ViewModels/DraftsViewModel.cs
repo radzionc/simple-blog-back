@@ -4,6 +4,6 @@ namespace Blog.API.ViewModels
 {
     public class DraftsViewModel
     {
-        public List<DraftViewModel> Drafts { get; set; }
+        public List<DraftViewModel> Stories { get; set; }
     }
 }

@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Blog.API.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    [Migration("20181001051902_Story")]
-    partial class Story
+    [Migration("20181002071715_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -36,6 +36,8 @@ namespace Blog.API.Migrations
 
                     b.Property<string>("OwnerId")
                         .IsRequired();
+
+                    b.Property<long>("PublishTime");
 
                     b.Property<List<string>>("Tags");
 
