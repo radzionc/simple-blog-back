@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using AutoMapper;
 using Blog.API.Services.Abstraction;
 using Blog.API.ViewModels;
 using Blog.Data.Abstract;
@@ -15,25 +16,19 @@ namespace Blog.API.Controllers
     public class StoriesController : ControllerBase
     {
         IStoryRepository storyRepository;
+        IMapper mapper;
 
-        public StoriesController(IStoryRepository storyRepository)
+        public StoriesController(IStoryRepository storyRepository, IMapper mapper)
         {
             this.storyRepository = storyRepository;
+            this.mapper = mapper;
         }
 
         [HttpGet("{id}")]
         public ActionResult<StoryDetailViewModel> GetStoryDetail(string id)
         {
             var story = storyRepository.GetSingle(s => s.Id == id, s => s.Owner);
-            return new StoryDetailViewModel{
-                Id = story.Id,
-                Title = story.Title,
-                Content = story.Content,
-                Tags = story.Tags,
-                PublishTime = story.PublishTime,
-                OwnerId = story.OwnerId,
-                OwnerUsername = story.Owner.Username
-            };
+            return mapper.Map<StoryDetailViewModel>(story);
         }
         
         [HttpPost]
@@ -106,13 +101,7 @@ namespace Blog.API.Controllers
 
             var drafts = storyRepository.FindBy(story => story.OwnerId == ownerId && story.Draft);
             return new DraftsViewModel {
-                Stories = drafts.Select(draft => new DraftViewModel {
-                    Id = draft.Id,
-                    Title = draft.Title,
-                    Content = draft.Content,
-                    Tags = draft.Tags,
-                    LastEditTime = draft.LastEditTime
-                }).ToList()
+                Stories = drafts.Select(mapper.Map<DraftViewModel>).ToList()
             };
         }
 
@@ -121,13 +110,7 @@ namespace Blog.API.Controllers
         {
             var stories = storyRepository.FindBy(story => story.OwnerId == id && !story.Draft);
             return new StoriesViewModel {
-                Stories = stories.Select(story => new StoryViewModel {
-                    Id = story.Id,
-                    Title = story.Title,
-                    Content = story.Content,
-                    Tags = story.Tags,
-                    PublishTime = story.PublishTime
-                }).ToList()
+                Stories = stories.Select(mapper.Map<StoryViewModel>).ToList()
             };
         }
 

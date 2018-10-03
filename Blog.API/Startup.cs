@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Blog.API.Services;
 using Blog.API.Services.Abstraction;
+using Blog.API.ViewModels.Mapping;
 using Blog.Data;
 using Blog.Data.Abstract;
 using Blog.Data.Repositories;
@@ -63,6 +65,8 @@ namespace Blog.API
                     };
                 });
 
+            var mappingConfig = new MapperConfiguration(mc => mc.AddProfile(new MappingProfile()));
+            services.AddSingleton(mappingConfig.CreateMapper());
             
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IStoryRepository, StoryRepository>();
