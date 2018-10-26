@@ -26,7 +26,7 @@ namespace Blog.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    Title = table.Column<string>(maxLength: 60, nullable: true),
+                    Title = table.Column<string>(maxLength: 100, nullable: true),
                     Content = table.Column<string>(nullable: true),
                     Tags = table.Column<List<string>>(nullable: true),
                     CreationTime = table.Column<long>(nullable: false),

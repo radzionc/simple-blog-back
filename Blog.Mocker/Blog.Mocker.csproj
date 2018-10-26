@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SyndicationFeed.ReaderWriter" Version="1.0.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Blog.Model\Blog.Model.csproj" />
+    <ProjectReference Include="..\Blog.Data\Blog.Data.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+
+</Project>

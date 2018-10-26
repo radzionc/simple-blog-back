@@ -40,7 +40,7 @@ namespace Blog.Data
             modelBuilder.Entity<Story>().ToTable("Story");
             modelBuilder.Entity<Story>()
                 .Property(s => s.Title)
-                .HasMaxLength(60);
+                .HasMaxLength(100);
             
             modelBuilder.Entity<Story>()
                 .Property(s => s.OwnerId)

@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Blog.API.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    [Migration("20181002071715_InitialMigration")]
+    [Migration("20181026094654_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace Blog.API.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Blog.Model.Story", b =>
@@ -42,7 +42,7 @@ namespace Blog.API.Migrations
                     b.Property<List<string>>("Tags");
 
                     b.Property<string>("Title")
-                        .HasMaxLength(60);
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
