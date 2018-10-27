@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
+using Blog.API.Services;
 using Blog.Mocker.Abstraction;
 using Blog.Model;
 using Microsoft.SyndicationFeed;
@@ -15,20 +16,21 @@ namespace Blog.Mocker
   public class Medium : IMocksPacker
   {
     const string FEEDS_URL = "https://medium.com/feed/";
-    const string BASIC_CONTENT = "{'object':'value','document':{'object':'document','data':{},'nodes':[{'object':'block','type':'heading-two','data':{},'nodes':[{'object':'text','leaves':[{'object':'leaf','text': TITLE,'marks':[]}]}]},{'object':'block','type':'paragraph','data':{},'nodes':[{'object':'text','leaves':[{'object':'leaf','text':'','marks':[]}]}]}]}}";
+    const string BASIC_CONTENT = "{\"object\":\"value\",\"document\":{\"object\":\"document\",\"data\":{},\"nodes\":[{\"object\":\"block\",\"type\":\"heading-two\",\"data\":{},\"nodes\":[{\"object\":\"text\",\"leaves\":[{\"object\":\"leaf\",\"text\": \"TITLE\",\"marks\":[]}]}]},{\"object\":\"block\",\"type\":\"paragraph\",\"data\":{},\"nodes\":[{\"object\":\"text\",\"leaves\":[{\"object\":\"leaf\",\"text\":\"\",\"marks\":[]}]}]}]}}";
     public async Task<Pack> GetPack(List<string> usernames)
     {
       var client = new HttpClient();
+      var authService = new AuthService(null, 0);
       var users = usernames.Select(username => new User
         {
           Id = username,
           Username = username,
-          Email = username.Replace("@", "") + "@mail.com",
-          Password = username + username,
+          Email = username + "@mail.com",
+          Password = authService.HashPassword(username + username),
         }
       ).ToList();
 
-      var urls = usernames.Select(username => FEEDS_URL + username);
+      var urls = usernames.Select(username => FEEDS_URL + "@" + username);
       var feedStrings = await Task.WhenAll(
         urls.Select(async url => await client.GetStringAsync(url))
       );

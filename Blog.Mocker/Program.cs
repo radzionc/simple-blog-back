@@ -11,20 +11,20 @@ namespace Blog.Mocker
     class Program
     {
         static readonly List<string> MEDIUM_USERS = new List<string> {
-            "@geekrodion",
-            "@umairh",
-            "@tomkuegler",
-            "@benjaminhardy",
-            "@krisgage",
-            "@dan.jeffries",
-            "@zdravko",
-            "@JessicaLexicus",
-            "@tiffany.sun",
-            "@Michael_Spencer",
-            "@larrykim",
-            "@nicolascole77",
-            "@alltopstartups",
-            "@ngoeke"
+            "geekrodion",
+            "umairh",
+            "tomkuegler",
+            "benjaminhardy",
+            "krisgage",
+            "dan.jeffries",
+            "zdravko",
+            "JessicaLexicus",
+            "tiffany.sun",
+            "Michael_Spencer",
+            "larrykim",
+            "nicolascole77",
+            "alltopstartups",
+            "ngoeke"
         };
         static async Task Main(string[] args)
         {
