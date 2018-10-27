@@ -106,11 +106,11 @@ namespace Blog.API.Controllers
         }
 
         [HttpGet("user/{id}")]
-        public ActionResult<StoriesViewModel> Get(string id)
+        public ActionResult<OwnerStoriesViewModel> Get(string id)
         {
             var stories = storyRepository.FindBy(story => story.OwnerId == id && !story.Draft);
-            return new StoriesViewModel {
-                Stories = stories.Select(mapper.Map<StoryViewModel>).ToList()
+            return new OwnerStoriesViewModel {
+                Stories = stories.Select(mapper.Map<OwnerStoryViewModel>).ToList()
             };
         }
 
