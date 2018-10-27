@@ -6,6 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Blog.Model\Blog.Model.csproj" />
     <ProjectReference Include="..\Blog.Data\Blog.Data.csproj" />
+    <ProjectReference Include="..\Blog.API\Blog.API.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
