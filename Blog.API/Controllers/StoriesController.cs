@@ -24,6 +24,15 @@ namespace Blog.API.Controllers
             this.mapper = mapper;
         }
 
+        [HttpGet()]
+        public ActionResult<StoriesViewModel> GetStories()
+        {
+            var stories = storyRepository.AllIncluding(s => s.Owner);
+            return new StoriesViewModel {
+                Stories = stories.Select(mapper.Map<StoryViewModel>).ToList()
+            };
+        }
+
         [HttpGet("{id}")]
         public ActionResult<StoryDetailViewModel> GetStoryDetail(string id)
         {
@@ -95,7 +104,7 @@ namespace Blog.API.Controllers
         }
 
         [HttpGet("drafts")]
-        public ActionResult<DraftsViewModel> Get()
+        public ActionResult<DraftsViewModel> GetDrafts()
         {
             var ownerId = HttpContext.User.Identity.Name;
 
