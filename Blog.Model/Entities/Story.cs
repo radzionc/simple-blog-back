@@ -15,5 +15,6 @@ namespace Blog.Model
 
     public User Owner { get; set; }
     public string OwnerId { get; set; }
+    public List<Like> Likes { get; set; }
   }
 }

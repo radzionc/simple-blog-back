@@ -19,6 +19,7 @@ namespace Blog.Data
 
             ConfigureModelBuilderForUser(modelBuilder);
             ConfigureModelBuilderForStory(modelBuilder);
+            ConfigureModelBuilderForLike(modelBuilder);
         }
 
         void ConfigureModelBuilderForUser(ModelBuilder modelBuilder)
@@ -51,6 +52,12 @@ namespace Blog.Data
                 .WithMany(u => u.Stories)
                 .HasForeignKey(s => s.OwnerId);
             
+        }
+
+        void ConfigureModelBuilderForLike(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Like>().ToTable("Like");
+            modelBuilder.Entity<Like>().HasKey(l => new { l.StoryId, l.UserId });
         }
     }
 }

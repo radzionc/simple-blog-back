@@ -16,11 +16,13 @@ namespace Blog.API.Controllers
     public class StoriesController : ControllerBase
     {
         IStoryRepository storyRepository;
+        ILikeRepository likeRepository;
         IMapper mapper;
 
-        public StoriesController(IStoryRepository storyRepository, IMapper mapper)
+        public StoriesController(IStoryRepository storyRepository, ILikeRepository likeRepository, IMapper mapper)
         {
             this.storyRepository = storyRepository;
+            this.likeRepository = likeRepository;
             this.mapper = mapper;
         }
 
@@ -36,8 +38,14 @@ namespace Blog.API.Controllers
         [HttpGet("{id}")]
         public ActionResult<StoryDetailViewModel> GetStoryDetail(string id)
         {
-            var story = storyRepository.GetSingle(s => s.Id == id, s => s.Owner);
-            return mapper.Map<StoryDetailViewModel>(story);
+            var story = storyRepository.GetSingle(s => s.Id == id, s => s.Owner, s => s.Likes);
+            var userId = HttpContext.User.Identity.Name;
+            var liked = story.Likes.Exists(l => l.UserId == userId);
+            
+            return mapper.Map<Story, StoryDetailViewModel>(
+                story,
+                opt => opt.AfterMap((src, dest) => dest.Liked = liked)
+            );
         }
         
         [HttpPost]
@@ -132,6 +140,31 @@ namespace Blog.API.Controllers
             storyRepository.DeleteWhere(story => story.Id == id);
             storyRepository.Commit();
 
+            return NoContent();
+        }
+
+        [HttpPost("{id}/toggleLike")]
+        public ActionResult ToggleLike(string id)
+        {
+            var userId = HttpContext.User.Identity.Name;
+
+            var story = storyRepository.GetSingle(s => s.Id == id, s => s.Likes);
+            if (userId == story.OwnerId) return BadRequest("You can't like your own story");
+
+            var existingLike = story.Likes.Find(l => l.UserId == userId);
+            if (existingLike == null)
+            {
+                likeRepository.Add(new Like
+                {
+                    UserId = userId,
+                    StoryId = id
+                });
+            }
+            else 
+            {
+                likeRepository.Delete(existingLike);
+            }
+            likeRepository.Commit();
             return NoContent();
         }
     }

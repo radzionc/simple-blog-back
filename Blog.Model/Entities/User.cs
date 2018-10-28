@@ -15,5 +15,6 @@ namespace Blog.Model
     public string Password { get; set; }
 
     public ICollection<Story> Stories { get; set; }
+    public ICollection<Like> Likes { get; set; }
   }
 }
