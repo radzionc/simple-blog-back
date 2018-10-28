@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Blog.API.Notifications;
 using Blog.API.Services;
 using Blog.API.Services.Abstraction;
 using Blog.API.ViewModels.Mapping;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,6 +65,23 @@ namespace Blog.API
                             Encoding.UTF8.GetBytes(Configuration.GetValue<string>("JWTSecretKey"))
                         )
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/notifications")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             var mappingConfig = new MapperConfiguration(mc => mc.AddProfile(new MappingProfile()));
@@ -78,7 +97,6 @@ namespace Blog.API
                     Configuration.GetValue<int>("JWTLifespan")
                 )
             );
-
             services
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
@@ -87,6 +105,12 @@ namespace Blog.API
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
+            services.AddSignalR().AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                options.PayloadSerializerSettings.Converters.Add(new StringEnumConverter());
+            });
+            services.AddSingleton<IUserIdProvider, UserIdProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -109,7 +133,10 @@ namespace Blog.API
             // app.UseHttpsRedirection();
             
             app.UseAuthentication();
-
+            app.UseSignalR(routes => 
+            {
+                routes.MapHub<NotificationsHub>("/notifications");
+            });
             app.UseMvc();
         }
     }
