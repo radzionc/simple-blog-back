@@ -1,12 +1,15 @@
 using System;
 using System.Linq;
 using AutoMapper;
+using Blog.API.Notifications;
+using Blog.API.Notifications.Models;
 using Blog.API.Services.Abstraction;
 using Blog.API.ViewModels;
 using Blog.Data.Abstract;
 using Blog.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Blog.API.Controllers
 {
@@ -17,12 +20,22 @@ namespace Blog.API.Controllers
     {
         IStoryRepository storyRepository;
         ILikeRepository likeRepository;
+        IUserRepository userRepository;
+        IHubContext<NotificationsHub> hubContext;
         IMapper mapper;
 
-        public StoriesController(IStoryRepository storyRepository, ILikeRepository likeRepository, IMapper mapper)
+        public StoriesController(
+            IStoryRepository storyRepository,
+            ILikeRepository likeRepository,
+            IUserRepository userRepository,
+            IHubContext<NotificationsHub> hubContext,
+            IMapper mapper
+        )
         {
             this.storyRepository = storyRepository;
             this.likeRepository = likeRepository;
+            this.hubContext = hubContext;
+            this.userRepository = userRepository;
             this.mapper = mapper;
         }
 
@@ -151,9 +164,23 @@ namespace Blog.API.Controllers
             var story = storyRepository.GetSingle(s => s.Id == id, s => s.Likes);
             if (userId == story.OwnerId) return BadRequest("You can't like your own story");
 
+            var user = userRepository.GetSingle(userId);
             var existingLike = story.Likes.Find(l => l.UserId == userId);
+            var payload = new LikeRelatedPayload
+            {
+                Username = user.Username,
+                StoryTitle = story.Title
+            };
             if (existingLike == null)
             {
+                hubContext.Clients.User(story.OwnerId).SendAsync(
+                    "notification",
+                    new Notification<LikeRelatedPayload>
+                    {
+                        NotificationType = NotificationType.LIKE,
+                        Payload = payload
+                    }
+                );
                 likeRepository.Add(new Like
                 {
                     UserId = userId,
@@ -162,6 +189,14 @@ namespace Blog.API.Controllers
             }
             else 
             {
+                hubContext.Clients.User(story.OwnerId).SendAsync(
+                    "notification",
+                    new Notification<LikeRelatedPayload>
+                    {
+                        NotificationType = NotificationType.UNLIKE,
+                        Payload = payload
+                    }
+                );
                 likeRepository.Delete(existingLike);
             }
             likeRepository.Commit();
