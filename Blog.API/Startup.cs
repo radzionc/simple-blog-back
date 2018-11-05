@@ -137,6 +137,7 @@ namespace Blog.API
             {
                 routes.MapHub<NotificationsHub>("/notifications");
             });
+            app.UseStaticFiles();
             app.UseMvc();
         }
     }
