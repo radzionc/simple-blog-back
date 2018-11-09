@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Blog.API.Notifications;
@@ -97,9 +98,10 @@ namespace Blog.API.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             
             var userId = HttpContext.User.Identity.Name;
-            if (!storyRepository.IsOwner(id, userId) || !storyRepository.IsInvited(id, userId)) return Forbid("You are not the owner of this story");
+            if (!storyRepository.IsOwner(id, userId) && !storyRepository.IsInvited(id, userId)) return StatusCode(403, "You are not the allowed to edit this story");
 
-            var newStory = storyRepository.GetSingle(id);
+            var newStory = storyRepository.GetSingle(s => s.Id == id, s => s.Shares);
+
             newStory.Title = model.Title;
             newStory.LastEditTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
             newStory.Tags = model.Tags;
@@ -108,6 +110,24 @@ namespace Blog.API.Controllers
             storyRepository.Update(newStory);
             storyRepository.Commit();
 
+            var usersToNotify = newStory.Shares.Select(s => s.UserId).Concat(new List<string> { userId, newStory.OwnerId }).Where(uid => uid != userId);
+            foreach (var uid in usersToNotify) {
+                hubContext.Clients.User(uid).SendAsync(
+                    "notification",
+                    new Notification<StoryEditPayload>
+                    {
+                        NotificationType = NotificationType.STORY_EDIT,
+                        Payload = new StoryEditPayload {
+                            Id = newStory.Id,
+                            Title = newStory.Title,
+                            LastEditTime = newStory.LastEditTime,
+                            Tags = newStory.Tags,
+                            Content = newStory.Content
+                        }
+                    }
+                );
+            }
+            
             return NoContent();
         }
 
@@ -148,6 +168,18 @@ namespace Blog.API.Controllers
                     StoryId = id
                 });
                 shareRepository.Commit();
+                hubContext.Clients.User(userToShare.Id).SendAsync(
+                    "notification",
+                    new Notification<ShareRelatedPayload>
+                    {
+                        NotificationType = NotificationType.SHARE,
+                        Payload = new ShareRelatedPayload
+                        {
+                            Username = owner.Username,
+                            StoryTitle = story.Title
+                        }
+                    }
+                );
             }
             return NoContent();
         }
