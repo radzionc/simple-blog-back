@@ -96,8 +96,8 @@ namespace Blog.API.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             
-            var ownerId = HttpContext.User.Identity.Name;
-            if (!storyRepository.IsOwner(id, ownerId)) return Forbid("You are not the owner of this story");
+            var userId = HttpContext.User.Identity.Name;
+            if (!storyRepository.IsOwner(id, userId) || !storyRepository.IsInvited(id, userId)) return Forbid("You are not the owner of this story");
 
             var newStory = storyRepository.GetSingle(id);
             newStory.Title = model.Title;
@@ -160,6 +160,25 @@ namespace Blog.API.Controllers
             var drafts = storyRepository.FindBy(story => story.OwnerId == ownerId && story.Draft);
             return new DraftsViewModel {
                 Stories = drafts.Select(mapper.Map<DraftViewModel>).ToList()
+            };
+        }
+
+        [HttpGet("shared")]
+        public ActionResult<SharedDraftsViewModel> GetSharedToYouDrafts()
+        {
+            var userId = HttpContext.User.Identity.Name;
+
+            var stories = shareRepository.StoriesSharedToUser(userId).Where(s => s.Draft);
+            var usernames = stories.Select(s => s.Owner.Username).Distinct().ToList();
+            
+            return new SharedDraftsViewModel {
+                UsersDrafts = usernames.Select(username => new UserDrafts {
+                    Username = username,
+                    Drafts = stories
+                        .Where(s => s.Owner.Username == username)
+                        .Select(mapper.Map<DraftViewModel>)
+                        .ToList()
+                }).ToList()
             };
         }
 
