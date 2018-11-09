@@ -11,15 +11,10 @@ using Blog.Data;
 
 namespace Blog.Data.Repositories
 {
-    public class EntityBaseRepository<T> : IEntityBaseRepository<T>
+    public class EntityBaseRepository<T> : BaseRepository<T>, IEntityBaseRepository<T>
             where T : class, IEntityBase, new()
     {
-        private BlogContext _context;
-
-        public EntityBaseRepository(BlogContext context)
-        {
-            _context = context;
-        }
+        public EntityBaseRepository(BlogContext context) : base(context) { }
         public virtual IEnumerable<T> GetAll()
         {
             return _context.Set<T>().AsEnumerable();
@@ -65,21 +60,10 @@ namespace Blog.Data.Repositories
             return _context.Set<T>().Where(predicate);
         }
 
-        public virtual void Add(T entity)
-        {
-            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
-            _context.Set<T>().Add(entity);
-        }
-
         public virtual void Update(T entity)
         {
             EntityEntry dbEntityEntry = _context.Entry<T>(entity);
             dbEntityEntry.State = EntityState.Modified;
-        }
-        public virtual void Delete(T entity)
-        {
-            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
-            dbEntityEntry.State = EntityState.Deleted;
         }
 
         public virtual void DeleteWhere(Expression<Func<T, bool>> predicate)
@@ -92,9 +76,5 @@ namespace Blog.Data.Repositories
             }
         }
 
-        public virtual void Commit()
-        {
-            _context.SaveChanges();
-        }
     }
 }

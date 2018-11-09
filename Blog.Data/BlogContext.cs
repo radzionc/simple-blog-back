@@ -20,6 +20,7 @@ namespace Blog.Data
             ConfigureModelBuilderForUser(modelBuilder);
             ConfigureModelBuilderForStory(modelBuilder);
             ConfigureModelBuilderForLike(modelBuilder);
+            ConfigureModelBuilderForShare(modelBuilder);
         }
 
         void ConfigureModelBuilderForUser(ModelBuilder modelBuilder)
@@ -58,6 +59,12 @@ namespace Blog.Data
         {
             modelBuilder.Entity<Like>().ToTable("Like");
             modelBuilder.Entity<Like>().HasKey(l => new { l.StoryId, l.UserId });
+        }
+
+        void ConfigureModelBuilderForShare(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Share>().ToTable("Share");
+            modelBuilder.Entity<Share>().HasKey(l => new { l.StoryId, l.UserId });
         }
     }
 }

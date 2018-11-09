@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Blog.Data.Repositories
 {
-    public class LikeRepository : BaseRepository<Like>, ILikeRepository
+    public class ShareRepository : BaseRepository<Share>, IShareRepository
     {
-        public LikeRepository(BlogContext context) : base(context) {}
+      public ShareRepository(BlogContext context) : base(context) {}
     }
 }

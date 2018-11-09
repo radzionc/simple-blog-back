@@ -21,6 +21,7 @@ namespace Blog.API.Controllers
         IStoryRepository storyRepository;
         ILikeRepository likeRepository;
         IUserRepository userRepository;
+        IShareRepository shareRepository;
         IHubContext<NotificationsHub> hubContext;
         IMapper mapper;
 
@@ -28,6 +29,7 @@ namespace Blog.API.Controllers
             IStoryRepository storyRepository,
             ILikeRepository likeRepository,
             IUserRepository userRepository,
+            IShareRepository shareRepository,
             IHubContext<NotificationsHub> hubContext,
             IMapper mapper
         )
@@ -36,6 +38,7 @@ namespace Blog.API.Controllers
             this.likeRepository = likeRepository;
             this.hubContext = hubContext;
             this.userRepository = userRepository;
+            this.shareRepository = shareRepository;
             this.mapper = mapper;
         }
 
@@ -109,7 +112,7 @@ namespace Blog.API.Controllers
         }
 
         [HttpPost("{id}/publish")]
-        public ActionResult Post(string id)
+        public ActionResult Publish(string id)
         {
             var ownerId = HttpContext.User.Identity.Name;
             if (!storyRepository.IsOwner(id, ownerId)) return Forbid("You are not the owner of this story");
@@ -121,6 +124,31 @@ namespace Blog.API.Controllers
             storyRepository.Update(newStory);
             storyRepository.Commit();
 
+            return NoContent();
+        }
+
+        [HttpPost("{id}/share")]
+        public ActionResult Share(string id, [FromBody]ShareViewModel model)
+        {
+            var ownerId = HttpContext.User.Identity.Name;
+            if (!storyRepository.IsOwner(id, ownerId)) return Forbid("You are not the owner of this story");
+
+            var userToShare = userRepository.GetSingle(u => u.Username == model.Username);
+            if (userToShare == null) {
+                return BadRequest(new { username = "No user with this name" });
+            }
+            var owner = userRepository.GetSingle(ownerId);
+            var story = storyRepository.GetSingle(s => s.Id == id, s => s.Shares);
+            var existingShare = story.Shares.Find(l => l.UserId == userToShare.Id);
+            if (existingShare == null)
+            {
+                shareRepository.Add(new Share
+                {
+                    UserId = userToShare.Id,
+                    StoryId = id
+                });
+                shareRepository.Commit();
+            }
             return NoContent();
         }
 
