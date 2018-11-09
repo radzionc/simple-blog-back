@@ -1,25 +1,28 @@
 @using Blog.API.ViewModels
 @model StoriesViewModel
 
-<h1>Plain Stories</h1>
-<ol>
-  @foreach (var item in Model.Stories)
-  {
-    <li>
-      <a href="/PlainStories/@item.Id">@item.Title</a>
-      <p>Author: @item.OwnerUsername</p>
-      <div>
-        <p>Tags:</p>
-        <ul>
-          @foreach (var tag in item.Tags)
-          {
-            <li>
-              @tag
-            </li>
-          }
-        </ul>
-      </div>
-      <p>Publish time: @item.PublishTime</p>
-    </li>
-  }
-</ol>
+@{
+    Layout = "_Layout";
+}
+
+@foreach (var item in Model.Stories)
+{
+  <div class="story-item">
+    <a href="/PlainStories/@item.Id">
+      <h3>@item.Title</h3>
+    </a>
+    <p>Author: @item.OwnerUsername</p>
+    <div>
+      <p>Tags:</p>
+      <ul>
+        @foreach (var tag in item.Tags)
+        {
+          <li>
+            @tag
+          </li>
+        }
+      </ul>
+    </div>
+    <p>Publish time: @DateTimeOffset.FromUnixTimeSeconds(@item.PublishTime).Date.ToString("d")</p>
+  </div>
+}
