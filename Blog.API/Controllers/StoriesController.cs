@@ -229,6 +229,8 @@ namespace Blog.API.Controllers
             var ownerId = HttpContext.User.Identity.Name;
             if (!storyRepository.IsOwner(id, ownerId)) return Forbid("You are not the owner of this story");
 
+            shareRepository.DeleteWhere(share => share.StoryId == id);
+            likeRepository.DeleteWhere(share => share.StoryId == id);
             storyRepository.DeleteWhere(story => story.Id == id);
             storyRepository.Commit();
 

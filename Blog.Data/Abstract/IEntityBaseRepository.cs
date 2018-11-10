@@ -15,6 +15,5 @@ namespace Blog.Data.Abstract
         T GetSingle(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includeProperties);
         IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate);
         void Update(T entity);
-        void DeleteWhere(Expression<Func<T, bool>> predicate);
     }
 }

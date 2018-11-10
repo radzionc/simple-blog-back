@@ -31,6 +31,16 @@ namespace Blog.Data.Repositories
             dbEntityEntry.State = EntityState.Deleted;
         }
 
+        public virtual void DeleteWhere(Expression<Func<T, bool>> predicate)
+        {
+            IEnumerable<T> entities = _context.Set<T>().Where(predicate);
+
+            foreach(var entity in entities)
+            {
+                _context.Entry<T>(entity).State = EntityState.Deleted;
+            }
+        }
+
         public virtual void Commit()
         {
             _context.SaveChanges();
