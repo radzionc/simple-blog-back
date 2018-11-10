@@ -137,7 +137,7 @@ namespace Blog.API.Controllers
             var ownerId = HttpContext.User.Identity.Name;
             if (!storyRepository.IsOwner(id, ownerId)) return Forbid("You are not the owner of this story");
 
-            var newStory = storyRepository.GetSingle(id);
+            var newStory = storyRepository.GetSingle(s => s.Id == ownerId);
             newStory.Draft = false;
             newStory.PublishTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
 
@@ -157,8 +157,12 @@ namespace Blog.API.Controllers
             if (userToShare == null) {
                 return BadRequest(new { username = "No user with this name" });
             }
-            var owner = userRepository.GetSingle(ownerId);
+            var owner = userRepository.GetSingle(s => s.Id == ownerId);
             var story = storyRepository.GetSingle(s => s.Id == id, s => s.Shares);
+            if (story.OwnerId == ownerId) {
+                return BadRequest(new { username = "You can't share story with yourself" });
+            }
+
             var existingShare = story.Shares.Find(l => l.UserId == userToShare.Id);
             if (existingShare == null)
             {
@@ -245,7 +249,7 @@ namespace Blog.API.Controllers
             var story = storyRepository.GetSingle(s => s.Id == id, s => s.Likes);
             if (userId == story.OwnerId) return BadRequest("You can't like your own story");
 
-            var user = userRepository.GetSingle(userId);
+            var user = userRepository.GetSingle(s => s.Id == userId);
             var existingLike = story.Likes.Find(l => l.UserId == userId);
             var payload = new LikeRelatedPayload
             {

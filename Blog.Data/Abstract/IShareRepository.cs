@@ -3,7 +3,7 @@ using Blog.Model;
 
 namespace Blog.Data.Abstract
 {
-    public interface IShareRepository : IBaseRepository<Share>
+    public interface IShareRepository : IEntityBaseRepository<Share>
     {
         List<Story> StoriesSharedToUser(string userId);
     }

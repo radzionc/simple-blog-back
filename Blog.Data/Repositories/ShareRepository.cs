@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Blog.Data.Repositories
 {
-    public class ShareRepository : BaseRepository<Share>, IShareRepository
+    public class ShareRepository : EntityBaseRepository<Share>, IShareRepository
     {
       public ShareRepository(BlogContext context) : base(context) {}
 

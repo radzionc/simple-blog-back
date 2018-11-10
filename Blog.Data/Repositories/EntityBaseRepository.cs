@@ -11,10 +11,41 @@ using Blog.Data;
 
 namespace Blog.Data.Repositories
 {
-    public class EntityBaseRepository<T> : BaseRepository<T>, IEntityBaseRepository<T>
-            where T : class, IEntityBase, new()
+    public class EntityBaseRepository<T> : IEntityBaseRepository<T>
+            where T : class
     {
-        public EntityBaseRepository(BlogContext context) : base(context) { }
+        protected BlogContext _context;
+
+        public EntityBaseRepository(BlogContext context)
+        {
+            _context = context;
+        }
+
+        public virtual void Add(T entity)
+        {
+            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
+            _context.Set<T>().Add(entity);
+        }
+        public virtual void Delete(T entity)
+        {
+            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
+            dbEntityEntry.State = EntityState.Deleted;
+        }
+
+        public virtual void DeleteWhere(Expression<Func<T, bool>> predicate)
+        {
+            IEnumerable<T> entities = _context.Set<T>().Where(predicate);
+
+            foreach(var entity in entities)
+            {
+                _context.Entry<T>(entity).State = EntityState.Deleted;
+            }
+        }
+
+        public virtual void Commit()
+        {
+            _context.SaveChanges();
+        }
         public virtual IEnumerable<T> GetAll()
         {
             return _context.Set<T>().AsEnumerable();
@@ -32,11 +63,6 @@ namespace Blog.Data.Repositories
                 query = query.Include(includeProperty);
             }
             return query.AsEnumerable();
-        }
-
-        public T GetSingle(string id)
-        {
-            return _context.Set<T>().FirstOrDefault(x => x.Id == id);
         }
 
         public T GetSingle(Expression<Func<T, bool>> predicate)
