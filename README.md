@@ -1,5 +1,5 @@
-# simple-blog-back
-[simple-blog-front repo](https://github.com/RodionChachura/simple-blog-front)
+# Back-End for Simple Blog
+You could find the front-end [here](https://github.com/RodionChachura/simple-blog-front).
 
 >
 
@@ -8,6 +8,10 @@
 ## Requirements:
  - .NET Core 2+
  - PostgreSQL(connection string specified in Blog.API/appsettings.json)
+ 
+ ## Technologies
+ * ASP.NET Core
+ * Entity Framework
 
 ## Example of how to create a database user
 ```bash
